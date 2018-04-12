@@ -33,7 +33,7 @@
             };
             const map = new google.maps.Map(document.getElementById("map"), mapOptions);
 
-            $.getJSON( "data/slopes.json", function( data ) {
+            $.get("/api/getSlopeData", function( data ) {
                 const coordinates = data.data;
 
                 for(let i = 0; i < coordinates.length; i++) {
