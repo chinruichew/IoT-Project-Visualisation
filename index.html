@@ -14,8 +14,30 @@
             margin: 0;
             padding: 0;
         }
+        #floating-panel {
+            position: absolute;
+            top: 10px;
+            left: 25%;
+            z-index: 5;
+            background-color: #fff;
+            padding: 5px;
+            border: 1px solid #999;
+            text-align: center;
+            font-family: 'Roboto','sans-serif';
+            line-height: 30px;
+            padding-left: 10px;
+        }
     </style></head>
 <body>
+    <div id="floating-panel">
+        <!--<b>Mode of Travel: </b>-->
+        <!--<select id="mode">-->
+            <!--<option value="DRIVING">Driving</option>-->
+            <!--<option value="WALKING">Walking</option>-->
+            <!--<option value="BICYCLING">Bicycling</option>-->
+            <!--<option value="TRANSIT">Transit</option>-->
+        <!--</select>-->
+    </div>
     <div id="map"></div>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
@@ -276,16 +298,43 @@
             $.get("/api/getSlopeData", function( data ) {
                 const coordinates = data.data;
 
-                for(let i = 0; i < coordinates.length; i++) {
-                    const coordinate = coordinates[i];
+                setSlopeMarkers(map, coordinates);
+                setWheelChairRoute(map, coordinates);
+            });
+        }
 
-                    const marker = new google.maps.Marker({
-                        position: new google.maps.LatLng(coordinate.lat, coordinate.lng),
-                        title: "Slope here!",
-                        icon: "./images/wheelchair_icon.png"
-                    });
+        function setSlopeMarkers(map, coordinates) {
+            for(let i = 0; i < coordinates.length; i++) {
+                const coordinate = coordinates[i];
 
-                    marker.setMap(map);
+                const marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(coordinate.lat, coordinate.lng),
+                    title: "Slope here!",
+                    icon: "./images/wheelchair_icon.png"
+                });
+
+                marker.setMap(map);
+            }
+        }
+
+        function setWheelChairRoute(map, coordinates) {
+            const directionsService = new google.maps.DirectionsService();
+            const directionsDisplay = new google.maps.DirectionsRenderer();
+            directionsDisplay.setMap(map);
+            const request = {
+                origin: new google.maps.LatLng(1.296670, 103.852464),
+                destination: new google.maps.LatLng(1.297392, 103.849475),
+                travelMode: google.maps.TravelMode.WALKING
+                // waypoints: [
+                //     {
+                //         location: new google.maps.LatLng(coordinates[0].lat, coordinates[0].lng),
+                //         stopover: false
+                //     }
+                // ]
+            };
+            directionsService.route(request, function(response, status) {
+                if (status === google.maps.DirectionsStatus.OK) {
+                    directionsDisplay.setDirections(response);
                 }
             });
         }
