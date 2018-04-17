@@ -4,6 +4,16 @@
       "name": "SIS Subway",
       "lat": 1.297493,
       "lng": 103.849863
+    },
+    {
+      "name": "Outside SOL",
+      "lat": 1.294730,
+      "lng": 103.849640
+    },
+    {
+      "name": "SOB Ramp",
+      "lat": 1.294942,
+      "lng": 103.849833
     }
   ]
 }

@@ -29,7 +29,7 @@
         }
     </style></head>
 <body>
-    <div id="floating-panel">
+    <!--<div id="floating-panel">-->
         <!--<b>Mode of Travel: </b>-->
         <!--<select id="mode">-->
             <!--<option value="DRIVING">Driving</option>-->
@@ -37,7 +37,7 @@
             <!--<option value="BICYCLING">Bicycling</option>-->
             <!--<option value="TRANSIT">Transit</option>-->
         <!--</select>-->
-    </div>
+    <!--</div>-->
     <div id="map"></div>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
@@ -309,7 +309,7 @@
 
                 const marker = new google.maps.Marker({
                     position: new google.maps.LatLng(coordinate.lat, coordinate.lng),
-                    title: "Slope here!",
+                    title: coordinate.name,
                     icon: "./images/wheelchair_icon.png"
                 });
 
@@ -324,13 +324,11 @@
             const request = {
                 origin: new google.maps.LatLng(1.296670, 103.852464),
                 destination: new google.maps.LatLng(1.297392, 103.849475),
-                travelMode: google.maps.TravelMode.WALKING
-                // waypoints: [
-                //     {
-                //         location: new google.maps.LatLng(coordinates[0].lat, coordinates[0].lng),
-                //         stopover: false
-                //     }
-                // ]
+                travelMode: google.maps.TravelMode.WALKING,
+                waypoints: [{
+                    location: new google.maps.LatLng(coordinates[0].lat, coordinates[0].lng),
+                    stopover: true
+                }]
             };
             directionsService.route(request, function(response, status) {
                 if (status === google.maps.DirectionsStatus.OK) {
