@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
     "server": "nodemon index.js --verbose",
     "dev": "start http://localhost:5000 && npm run server"
   },
