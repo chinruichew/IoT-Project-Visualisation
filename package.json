@@ -7,7 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
     "server": "nodemon index.js --verbose",
-    "dev": "start http://localhost:5000 && npm run server"
+    "dev": "start http://localhost:5000 && npm run server",
+    "update": "npm install --verbose && npm update --verbose",
+    "deploy": "npm run update && git add . --verbose && git commit -m \"aws deploy\" --verbose && git pull --verbose && git push origin master --verbose && eb deploy --verbose && eb open --verbose"
   },
   "repository": {
     "type": "git",
