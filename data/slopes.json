@@ -1,9 +1,14 @@
 {
   "data": [
     {
-      "name": "SIS Subway",
+      "name": "SIS Escalator",
       "lat": 1.297493,
       "lng": 103.849863
+    },
+    {
+      "name": "SIS Subway",
+      "lat": 1.297661,
+      "lng": 103.849565
     },
     {
       "name": "Outside SOL",
