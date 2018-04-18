@@ -17,7 +17,7 @@
         #floating-panel {
             position: absolute;
             top: 10px;
-            left: 25%;
+            left: 10%;
             z-index: 5;
             background-color: #fff;
             padding: 5px;
@@ -29,15 +29,17 @@
         }
     </style></head>
 <body>
-    <!--<div id="floating-panel">-->
-        <!--<b>Mode of Travel: </b>-->
-        <!--<select id="mode">-->
-            <!--<option value="DRIVING">Driving</option>-->
-            <!--<option value="WALKING">Walking</option>-->
-            <!--<option value="BICYCLING">Bicycling</option>-->
-            <!--<option value="TRANSIT">Transit</option>-->
-        <!--</select>-->
-    <!--</div>-->
+    <div id="floating-panel">
+        <div class="checkbox text-left">
+            <label>
+                <input class="panel-checkbox" type="checkbox" name="checkPath"> Show Path
+                <br/>
+                <input class="panel-checkbox" type="checkbox" name="checkSlopes"> Show Slopes
+                <br/>
+                <input class="panel-checkbox" type="checkbox" name="checkRoute"> Show Route
+            </label>
+        </div>
+    </div>
     <div id="map"></div>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
@@ -281,26 +283,36 @@
 
         $(init);
 
+        let map, directionsDisplay;
+        const pathMarkers = [];
+        const slopeMarkers = [];
         function initMap() {
             const myLatlng = new google.maps.LatLng(1.2963208, 103.8501191);
             const mapOptions = {
                 zoom: 19,
                 center: myLatlng
             };
-            const map = new google.maps.Map(document.getElementById("map"), mapOptions);
+            map = new google.maps.Map(document.getElementById("map"), mapOptions);
 
             if(new Date().getHours() < 8 || new Date().getHours() >= 19) {
                 const styledMapType = new google.maps.StyledMapType(style);
                 map.mapTypes.set('styled_map', styledMapType);
                 map.setMapTypeId('styled_map');
             }
+        }
 
-            $.get("/api/getSlopeData", function( data ) {
-                const coordinates = data.data;
+        function setPathMarkers(map, coordinates) {
+            for(let i = 0; i < coordinates.length; i++) {
+                const coordinate = coordinates[i];
 
-                setSlopeMarkers(map, coordinates);
-                setWheelChairRoute(map, coordinates);
-            });
+                const marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(coordinate.lat, coordinate.lng),
+                    title: coordinate.name
+                });
+
+                pathMarkers.push(marker);
+                marker.setMap(map);
+            }
         }
 
         function setSlopeMarkers(map, coordinates) {
@@ -313,13 +325,14 @@
                     icon: "./images/wheelchair_icon.png"
                 });
 
+                slopeMarkers.push(marker);
                 marker.setMap(map);
             }
         }
 
         function setWheelChairRoute(map, coordinates) {
             const directionsService = new google.maps.DirectionsService();
-            const directionsDisplay = new google.maps.DirectionsRenderer();
+            directionsDisplay = new google.maps.DirectionsRenderer();
             directionsDisplay.setMap(map);
             const request = {
                 origin: new google.maps.LatLng(1.296670, 103.852464),
@@ -338,30 +351,70 @@
         }
 
         function init() {
-            let camera, scene, renderer;
-            let geometry, material, mesh;
+            // Show Path of data collection
+            $('input[type="checkbox"][name="checkPath"]').change(function() {
+                if(this.checked) {
+                    $.get("/api/getPathData", function(data) {
+                        const coordinates = data.data;
+                        setPathMarkers(map, coordinates);
+                    });
+                } else {
+                    for(let i=0; i < pathMarkers.length; i++){
+                        pathMarkers[i].setMap(null);
+                    }
+                }
+            });
 
-            // initModel();
-            // animate();
+            // Show Slopes locations
+            $('input[type="checkbox"][name="checkSlopes"]').change(function() {
+                if(this.checked) {
+                    $.get("/api/getSlopeData", function( data ) {
+                        const coordinates = data.data;
+                        setSlopeMarkers(map, coordinates);
+                    });
+                } else {
+                    for(let i=0; i < slopeMarkers.length; i++){
+                        slopeMarkers[i].setMap(null);
+                    }
+                }
+            });
 
-            function initModel() {
+            // Show Recommended route
+            $('input[type="checkbox"][name="checkRoute"]').change(function() {
+                if(this.checked) {
+                    $.get("/api/getSlopeData", function( data ) {
+                        const coordinates = data.data;
+                        setWheelChairRoute(map, coordinates);
+                    });
+                } else {
+                    directionsDisplay.setMap(null);
+                }
+            });
 
-                camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
-                camera.position.z = 1;
-
-                scene = new THREE.Scene();
-
-                geometry = new THREE.BoxGeometry( 0.2, 0.2, 0.2 );
-                material = new THREE.MeshNormalMaterial();
-
-                mesh = new THREE.Mesh( geometry, material );
-                scene.add( mesh );
-
-                renderer = new THREE.WebGLRenderer( { antialias: true } );
-                renderer.setSize( window.innerWidth, window.innerHeight );
-                document.body.appendChild( renderer.domElement );
-
-            }
+            // let camera, scene, renderer;
+            // let geometry, material, mesh;
+            //
+            // // initModel();
+            // // animate();
+            //
+            // function initModel() {
+            //
+            //     camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
+            //     camera.position.z = 1;
+            //
+            //     scene = new THREE.Scene();
+            //
+            //     geometry = new THREE.BoxGeometry( 0.2, 0.2, 0.2 );
+            //     material = new THREE.MeshNormalMaterial();
+            //
+            //     mesh = new THREE.Mesh( geometry, material );
+            //     scene.add( mesh );
+            //
+            //     renderer = new THREE.WebGLRenderer( { antialias: true } );
+            //     renderer.setSize( window.innerWidth, window.innerHeight );
+            //     document.body.appendChild( renderer.domElement );
+            //
+            // }
         }
     </script>
 </body>

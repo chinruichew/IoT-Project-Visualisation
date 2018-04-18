@@ -17,5 +17,12 @@ app.get('/api/getSlopeData', async(req, res) => {
     });
 });
 
+app.get('/api/getPathData', async(req, res) => {
+    fs.readFile('./data/path.json', 'utf8', function (err, data) {
+        if (err) throw err;
+        res.send(JSON.parse(data));
+    });
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT);
